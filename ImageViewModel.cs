@@ -12,7 +12,7 @@ namespace RayTracer {
 
         private WriteableBitmap image;
         
-        private bool highRes = true;
+        private bool highRes = false;
 
         private int width = 600;
         private int height = 300;
