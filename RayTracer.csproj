@@ -64,6 +64,8 @@
     <Compile Include="Geometry\BoundingBox.cs" />
     <Compile Include="Geometry\BVHNode.cs" />
     <Compile Include="Geometry\GeometrySampler.cs" />
+    <Compile Include="Geometry\Rectangle.cs" />
+    <Compile Include="Geometry\TransformUtils.cs" />
     <Compile Include="LinearAlgebra\RotationMatrix.cs" />
     <Compile Include="Materials\Dielectric.cs" />
     <Compile Include="Materials\Lambertian.cs" />

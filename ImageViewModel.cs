@@ -21,8 +21,8 @@ namespace RayTracer {
 
         public ImageViewModel() {
             if (highRes) {
-                this.width = 2560;
-                this.height = 1440;
+                this.width = 1280;
+                this.height = 720;
             }
             this.Image = new WriteableBitmap(width, height, 96, 96, PixelFormats.Bgr32, null);
             this.model = new ImageModel(this.width, this.height, UpdateImage, this.highRes);

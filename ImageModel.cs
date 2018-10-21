@@ -22,7 +22,7 @@ namespace RayTracer {
         private Camera camera;
 
         private int sampleCount = 20;
-        private int maxBounceDepth = 5;
+        private int maxBounceDepth = 10;
 
         private int ballPlacementDimension = 5;
 
@@ -49,15 +49,6 @@ namespace RayTracer {
             this.R = new int[this.columns, this.rows];
             this.G = new int[this.columns, this.rows];
             this.B = new int[this.columns, this.rows];
-
-            this.hFovDeg = 40;
-            var lookFrom = new Vec3(13,2,3);
-            var lookAt = new Vec3(0,0,0);
-            var lookUp = new Vec3(0,1,0);
-            float focusDist = (lookAt - lookFrom).Length;
-            float aperture = 0.05f;
-            this.camera = new CartesianCamera(this.rows, this.columns, this.hFovDeg, lookFrom, lookAt, lookUp,
-                aperture, focusDist);
         }
 
         public int[,] R { get; }
@@ -67,7 +58,7 @@ namespace RayTracer {
         public void Update() {
             //Console.WriteLine("Good time to attach. Press anything to start raytracer.");
             //Console.ReadLine();
-            PopulateScene();
+            CreateScene2();
             Console.WriteLine("Rendering started...");
             var sw = new Stopwatch();
             
@@ -107,8 +98,47 @@ namespace RayTracer {
             this.updateImage.Invoke();
         }
 
-        private void PopulateScene() {
+        private void CreateScene2() {
+            // Set up camera
+            this.hFovDeg = 90;
+            var lookFrom = new Vec3(0, 1, 1);
+            var lookAt = new Vec3(0, 0.5f, 0);
+            var lookUp = new Vec3(0, 1, 0);
+            float focusDist = (lookAt - lookFrom).Length;
+            float aperture = 0.00f;
+            this.camera = new CartesianCamera(this.rows, this.columns, this.hFovDeg, lookFrom, lookAt, lookUp,
+                aperture, focusDist);
+
+            var hitables = new List<Hitable>();
+            var recOrigin = new Vec3(2f, -2, -2);
+            var u = new Vec3(0, 4 , 0);
+            var v = new Vec3(-4, 0, 0);
+            var material = new Metal(new Vec3(0.1f,0.1f,0.3f), 0.0f);
+            hitables.Add(new Rectangle(recOrigin, u, v, material));
+
+            var sphere = new Sphere(new Vec3(0,0,-1), 0.5f, new Metal(new Vec3(0.7f, 0.25f, 0), 0.1f));
+            hitables.Add(sphere);
+            sphere = new Sphere(new Vec3(1.3f, 0, -1), 0.5f, new Metal(new Vec3(0,0.25f,0.7f),0.025f));
+            hitables.Add(sphere);
+            sphere = new Sphere(new Vec3(-1.3f, 0, -1), 0.5f, new Metal(new Vec3(0.1f, 0.8f, 0.3f), 0.05f));
+            hitables.Add(sphere);
+            this.world = new HitableList(hitables);
+        }
+
+        private void CreateScene1() {
             Console.WriteLine("Populating scene..");
+
+            // Set up camera
+            this.hFovDeg = 40;
+            var lookFrom = new Vec3(13, 2, 3);
+            var lookAt = new Vec3(0, 0, 0);
+            var lookUp = new Vec3(0, 1, 0);
+            float focusDist = (lookAt - lookFrom).Length;
+            float aperture = 0.05f;
+            this.camera = new CartesianCamera(this.rows, this.columns, this.hFovDeg, lookFrom, lookAt, lookUp,
+                aperture, focusDist);
+
+            // Add spheres
             var hitables = new List<Hitable>();
             hitables.Add(new Sphere(new Vec3(0, -1000, 0), 1000, new Lambertian(new Vec3(0.5f, 0.5f, 0.5f))));
             Random random = new Random(10);
