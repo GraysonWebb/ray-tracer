@@ -73,6 +73,9 @@
     <Compile Include="Materials\Metal.cs" />
     <Compile Include="Mathy\MathUtils.cs" />
     <Compile Include="Mathy\StaticRandom.cs" />
+    <Compile Include="Textures\CheckerTexture.cs" />
+    <Compile Include="Textures\ConstantTexture.cs" />
+    <Compile Include="Textures\Texture.cs" />
     <Compile Include="ViewPort\Camera.cs" />
     <Compile Include="ViewPort\CartesianCamera.cs" />
     <Compile Include="ViewPort\RadialCamera.cs" />

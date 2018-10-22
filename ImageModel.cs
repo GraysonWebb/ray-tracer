@@ -2,6 +2,7 @@
 using RayTracer.LinearAlgebra;
 using RayTracer.Materials;
 using RayTracer.Mathy;
+using RayTracer.Textures;
 using RayTracer.ViewPort;
 using System;
 using System.Collections.Generic;
@@ -24,7 +25,7 @@ namespace RayTracer {
         private int sampleCount = 20;
         private int maxBounceDepth = 10;
 
-        private int ballPlacementDimension = 5;
+        private int ballPlacementDimension = 3;
 
         private float hFovDeg;
 
@@ -58,7 +59,7 @@ namespace RayTracer {
         public void Update() {
             //Console.WriteLine("Good time to attach. Press anything to start raytracer.");
             //Console.ReadLine();
-            CreateScene2();
+            CreateScene3();
             Console.WriteLine("Rendering started...");
             var sw = new Stopwatch();
             
@@ -98,6 +99,29 @@ namespace RayTracer {
             this.updateImage.Invoke();
         }
 
+        private void CreateScene3() {
+            // Set up camera
+            this.hFovDeg = 25;
+            var lookFrom = new Vec3(13, 2, 3);
+            var lookAt = new Vec3(0, 0, 0);
+            var lookUp = new Vec3(0, 1, 0);
+            float focusDist = 10;
+            float aperture = 0;
+            this.camera = new CartesianCamera(this.rows, this.columns, this.hFovDeg, lookFrom, lookAt, lookUp,
+                aperture, focusDist);
+
+            // Add items
+            var hitables = new List<Hitable>();
+            var oddTexture = new ConstantTexture(new Vec3(0.2f, 0.3f, 0.1f));
+            var evenTexture = new ConstantTexture(new Vec3(0.9f, 0.9f, 0.9f));
+            var checkerTexture = new CheckerTexture(evenTexture, oddTexture);
+
+            hitables.Add(new Sphere(new Vec3(0, -10, 0), 10, new Lambertian(checkerTexture)));
+            hitables.Add(new Sphere(new Vec3(0, 10, 0), 10, new Lambertian(checkerTexture)));
+
+            this.world = new HitableList(hitables);
+        }
+
         private void CreateScene2() {
             // Set up camera
             this.hFovDeg = 90;
@@ -129,18 +153,21 @@ namespace RayTracer {
             Console.WriteLine("Populating scene..");
 
             // Set up camera
-            this.hFovDeg = 40;
+            this.hFovDeg = 35;
             var lookFrom = new Vec3(13, 2, 3);
             var lookAt = new Vec3(0, 0, 0);
             var lookUp = new Vec3(0, 1, 0);
             float focusDist = (lookAt - lookFrom).Length;
-            float aperture = 0.05f;
+            float aperture = 0.1f;
             this.camera = new CartesianCamera(this.rows, this.columns, this.hFovDeg, lookFrom, lookAt, lookUp,
                 aperture, focusDist);
 
             // Add spheres
             var hitables = new List<Hitable>();
-            hitables.Add(new Sphere(new Vec3(0, -1000, 0), 1000, new Lambertian(new Vec3(0.5f, 0.5f, 0.5f))));
+            var oddTexture = new ConstantTexture(new Vec3(0.2f, 0.3f, 0.1f));
+            var evenTexture = new ConstantTexture(new Vec3(0.9f, 0.9f, 0.9f));
+            var checkerTexture = new CheckerTexture(evenTexture, oddTexture);
+            hitables.Add(new Sphere(new Vec3(0, -1000, 0), 1000, new Lambertian(checkerTexture)));
             Random random = new Random(10);
             int dim = this.ballPlacementDimension;
             for (int a = -dim; a < dim; a++) {
@@ -150,9 +177,9 @@ namespace RayTracer {
                     if ((center - new Vec3(4, 0.2f, 0)).Length > 0.9) {
                         if (chooseMat < 0.4) { // diffuse
                             hitables.Add(new Sphere(center, 0.2f, new Lambertian(
-                                new Vec3((float)(random.NextDouble() * random.NextDouble()),
+                                new ConstantTexture(new Vec3((float)(random.NextDouble() * random.NextDouble()),
                                 (float)(random.NextDouble() * random.NextDouble()),
-                                (float)(random.NextDouble() * random.NextDouble())))));
+                                (float)(random.NextDouble() * random.NextDouble()))))));
                         } else if (chooseMat < 0.65) { // metal
                             hitables.Add(new Sphere(center, 0.2f, new Metal(
                                 new Vec3(0.5f * (float)(1 + random.NextDouble()),
@@ -166,7 +193,7 @@ namespace RayTracer {
                 }
             }
             hitables.Add(new Sphere(new Vec3(0, 1, 0), 1, new Dielectric(1.5f)));
-            hitables.Add(new Sphere(new Vec3(-4, 1, 0), 1, new Lambertian(new Vec3(0.4f, 0.2f, 0.1f))));
+            hitables.Add(new Sphere(new Vec3(-4, 1, 0), 1, new Lambertian(new ConstantTexture(new Vec3(0.4f, 0.2f, 0.1f)))));
             hitables.Add(new Sphere(new Vec3(4, 1, 0), 1, new Metal(new Vec3(0.7f, 0.6f, 0.5f), 0)));
             //this.world = new HitableList(hitables);
             this.world = new BVHNode(hitables, this.tMin, this.tMax, new Random());
