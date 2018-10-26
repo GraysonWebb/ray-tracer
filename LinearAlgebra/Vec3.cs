@@ -109,6 +109,12 @@ namespace RayTracer.LinearAlgebra {
             z *= scaleFactor;
         }
 
+        public void Clamp(float min, float max) {
+            this.x = x < min ? min : x > max ? max : x;
+            this.y = y < min ? min : y > max ? max : y;
+            this.z = z < min ? min : z > max ? max : z;
+        }
+
 
         public static float Dot(Vec3 left, Vec3 right) {
             return left.x * right.x + left.y * right.y + left.z * right.z;

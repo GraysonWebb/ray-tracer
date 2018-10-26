@@ -15,7 +15,7 @@ namespace RayTracer {
         private bool highRes = false;
 
         private int width = 600;
-        private int height = 300;
+        private int height = 400;
 
         private ImageModel model;
 

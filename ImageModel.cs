@@ -22,7 +22,7 @@ namespace RayTracer {
 
         private Camera camera;
 
-        private int sampleCount = 20;
+        private int sampleCount = 10;
         private int maxBounceDepth = 10;
 
         private int ballPlacementDimension = 3;
@@ -59,7 +59,7 @@ namespace RayTracer {
         public void Update() {
             //Console.WriteLine("Good time to attach. Press anything to start raytracer.");
             //Console.ReadLine();
-            CreateScene3();
+            CreateScene4();
             Console.WriteLine("Rendering started...");
             var sw = new Stopwatch();
             
@@ -86,9 +86,9 @@ namespace RayTracer {
                     () => { lock (threadLockObject) { return new Random(rand.Next()); } },
                     (x, loop, localRandom) => {
                         var color = RayTrace(x, y, localRandom);
-                        R[x, y] = (int)(255.99 * color.R);
-                        G[x, y] = (int)(255.99 * color.G);
-                        B[x, y] = (int)(255.99 * color.B);
+                        R[x, y] = (int)(255.99 * (color.R));
+                        G[x, y] = (int)(255.99 * (color.G));
+                        B[x, y] = (int)(255.99 * (color.B));
                         return localRandom;
                     },
                     (x) => { });
@@ -99,6 +99,32 @@ namespace RayTracer {
             this.updateImage.Invoke();
         }
 
+        /// <summary>
+        /// Pdf 2, perlin noise
+        /// </summary>
+        private void CreateScene4() {
+            // Set up camera
+            this.hFovDeg = 35;
+            var lookFrom = new Vec3(13, 2, 3);
+            var lookAt = new Vec3(0, 0, 0);
+            var lookUp = new Vec3(0, 1, 0);
+            float focusDist = 10;
+            float aperture = 0;
+            this.camera = new CartesianCamera(this.rows, this.columns, this.hFovDeg, lookFrom, lookAt, lookUp,
+                aperture, focusDist);
+
+            // Add items
+            var hitables = new List<Hitable>();
+            var perlinTexture = new NoiseTexture();
+            hitables.Add(new Sphere(new Vec3(0, -1000, 0), 1000, new Lambertian(perlinTexture)));
+            hitables.Add(new Sphere(new Vec3(0, 2, 0), 2, new Lambertian(perlinTexture)));
+
+            this.world = new HitableList(hitables);
+        }
+
+        /// <summary>
+        /// Scene from pdf 2, texture; two checker balls touching.
+        /// </summary>
         private void CreateScene3() {
             // Set up camera
             this.hFovDeg = 25;
@@ -122,6 +148,9 @@ namespace RayTracer {
             this.world = new HitableList(hitables);
         }
 
+        /// <summary>
+        /// Scene with rectangle and three spheres.
+        /// </summary>
         private void CreateScene2() {
             // Set up camera
             this.hFovDeg = 90;
@@ -149,6 +178,9 @@ namespace RayTracer {
             this.world = new HitableList(hitables);
         }
 
+        /// <summary>
+        /// Scene from pdf 1; three spheres with lots around.
+        /// </summary>
         private void CreateScene1() {
             Console.WriteLine("Populating scene..");
 
@@ -201,13 +233,15 @@ namespace RayTracer {
         }
 
         private Vec3 RayTrace(int x, int y, Random random) {
-            var pixelColor = new Vec3();
+            var pixelColor = new Vec3(0,0,0);
             for (int sample = 0; sample < this.sampleCount; sample++) {
                 var ray = this.camera.GetRay(x,y, random);
                 pixelColor += Color(ray, this.world, 0, random);
             }
             pixelColor /= (float) this.sampleCount;
-            // gamma = 2, col[i] ^(1/gamma)
+            pixelColor.Clamp(0,1);
+            //gamma = 2, col[i] ^ (1 / gamma)
+
             pixelColor.R = (float)Math.Sqrt(pixelColor.R);
             pixelColor.G = (float)Math.Sqrt(pixelColor.G);
             pixelColor.B = (float)Math.Sqrt(pixelColor.B);
